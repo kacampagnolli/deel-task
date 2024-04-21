@@ -80,7 +80,7 @@ const pay = async (req, res) => {
     ]);
 
     await Job.update(
-      { paid: true },
+      { paid: true, paymentDate: Date.now() },
       {
         where: { id: jobToPay.id },
         transaction: t,
