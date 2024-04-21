@@ -1,4 +1,6 @@
 const { profileToQuery } = require("../utils/query");
+const JobNotFound = require("../errors/JobNotFound");
+const PaymentError = require("../errors/PaymentError");
 
 const listUnpaid = async (req, res) => {
   const profile = req.profile;
@@ -52,11 +54,11 @@ const pay = async (req, res) => {
     );
 
     if (!jobToPay) {
-      throw new JobNotFound(jobToPay.id);
+      throw new JobNotFound(id);
     }
 
     if (jobToPay.paid) {
-      throw new PaymentError(`Job '${jobToPay.id}' has already been paid.`);
+      throw new PaymentError(`Job ${jobToPay.id} has already been paid.`);
     }
 
     const [client, contractor] = await Promise.all([
@@ -100,9 +102,8 @@ const pay = async (req, res) => {
       return res.status(404).json({ message: e.message }).end();
     } else if (e instanceof PaymentError) {
       return res.status(422).json({ message: e.message }).end();
-    } else {
-      return res.status(500).json({ message: `Internal server erro.` }).end();
     }
+    return res.status(500).json({ message: `Internal server erro.` }).end();
   }
 };
 
